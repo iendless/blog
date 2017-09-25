@@ -58,6 +58,7 @@ void orderTree(treeNode *treeRoot)
     }
 }
 
+/**
 void removeKey(treeNode *root,int key)
 {
     if(root == NULL)
@@ -83,6 +84,30 @@ void removeKey(treeNode *root,int key)
                 root->righTree = (root->leftTree == NULL) ? root->righTree->righTree:root->leftTree->righTree;  
         }
 }
+**/          这是一个很垃圾很丑的版本！！！ 下面有新的
+treeNode *removeKey(treeNode *root,int key)
+{
+    if(root == NULL)
+        return ;
+    if(root->key > key)
+        removeKey(root->leftTree,key);
+    else if(root->key < key)
+        removeKey(root->righTree,key);
+        else if(root->leftTree!=NULL && root->righTree!=NULL)
+        {
+            root->key = findMin(root->righTree)->key;
+            root->righTree = removeKey(root->righTree,root->key);
+        }
+            else if(root->leftTree==NULL && root->righTree==NULL)
+                free(root);
+            else
+            {
+                treeNode *t = root;
+                root = (root->leftTree != NULL) ? root->righTree : root->leftTree;
+                free(t);
+            }
+    return root;
+}      //该版本为函数添加了返回值，从而解决了下级指针无法返回给上级指针进行调试
 
 treeNode *findMin(treeNode *root)
 {
