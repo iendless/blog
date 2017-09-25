@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define TYPED_ALLOC(type) (type *)malloc(sizeof(type))
+typedef struct tree_node_s
+{
+    struct tree_node_s *leftTree;
+    struct tree_node_s *righTree;
+    int key;
+}treeNode;
+treeNode *insertKey(treeNode*,int);
+void orderTree(treeNode*);
+void removeKey(treeNode*,int);
+treeNode *findMin(treeNode*);
+int main(void)
+{
+    treeNode *treeRoot = NULL;	//开始没有初始化NULL导致挂掉
+    int data,status;
+    for(status = scanf("%d",&data);
+    status == 1;
+    status = scanf("%d",&data))	  //其个这个输入并不好
+	{
+      treeRoot = insertKey(treeRoot,data);
+    }
+    orderTree(treeRoot);
+    removeKey(treeRoot,5);
+    orderTree(treeRoot);
+}
+
+treeNode *insertKey(treeNode *treeRoot,int key)
+{
+    if(treeRoot == NULL)
+    {
+        treeRoot = TYPED_ALLOC(treeNode);
+        treeRoot->key = key;
+        treeRoot->leftTree = NULL;
+        treeRoot->righTree = NULL;
+    }
+    else if(key == treeRoot->key)
+        return treeRoot;
+    else if(key > treeRoot->key)
+    {
+        treeRoot->righTree = insertKey(treeRoot->righTree,key);
+    }
+    else
+    {
+        treeRoot->leftTree = insertKey(treeRoot->leftTree,key);
+    }
+    return treeRoot;
+}
+
+void orderTree(treeNode *treeRoot)
+{
+    if(treeRoot != NULL)
+    {
+        orderTree(treeRoot->leftTree);
+        printf("%d   ",treeRoot->key);
+        orderTree(treeRoot->righTree);
+    }
+}
+
+void removeKey(treeNode *root,int key)
+{
+    if(root == NULL)
+        return ;
+    if(root->key > key)
+        removeKey(root->leftTree,key);
+    else if(root->key < key)
+        removeKey(root->righTree,key);
+        else if(root->leftTree!=NULL && root->righTree!=NULL)
+        {
+            root->key = findMin(root->righTree)->key;
+            removeKey(root->righTree,root->key);
+        }
+            else if(root->leftTree==NULL && root->righTree==NULL)
+                free(root);
+            else
+            {
+                treeNode *t = root;
+                root->key = (root->leftTree == NULL) ? root->righTree->key:root->leftTree->key;					
+				//此处曾直接将指针复制，经大佬提醒，得知将指针传入函数中后，指针在函数内如果改变了的指向不能返回至函数体外，
+				//我们用指针仅用其指向的内容为机器中的地址，故仅可修改其指向的内容而不可修改其指向
+                root->leftTree = (root->leftTree == NULL) ? root->righTree->leftTree:root->leftTree->leftTree;
+                root->righTree = (root->leftTree == NULL) ? root->righTree->righTree:root->leftTree->righTree;  
+        }
+}
+
+treeNode *findMin(treeNode *root)
+{
+    if(root != NULL)
+        for(; root->leftTree != NULL; root=root->leftTree);
+    return root;
+}
