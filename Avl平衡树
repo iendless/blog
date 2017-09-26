@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX(a,b) ((a) > (b) ? (a):(b))
+typedef struct Node
+{
+    int key;
+    struct Node *left;
+    struct Node *right;
+    int height;
+}node;
+node *insert(node*,int);
+static node *reLeft(node*);
+static node *reRight(node*);
+static node *reConturnLeft(node*);
+static node *reConturnRight(node*);
+static int Height(node*);
+void printTree(node*);
+int main()
+{
+    int data;
+    node *root = NULL;
+    while(scanf("%d",&data) == 1)
+    {
+        root = insert(root,data);
+    }
+    printTree(root);
+}
+node *insert(node* root,int key)
+{
+    if(root == NULL)
+    {
+        root = (node*)malloc(sizeof(node));
+        root->height = 0;
+        root->left = NULL;
+        root->right = NULL;
+        root->key = key;
+    }
+
+    else if(key < root->key)
+    {
+        root->left = insert(root->left,key);
+        //root->height = MAX(Height(root->right),Height(root->left))+1;
+        if(Height(root->left) - Height(root->right) == 2)
+            if(key < root->left->key)
+                root = reLeft(root);
+            else
+                root = reConturnLeft(root);
+    }
+    else if(key > root->key)
+    {
+        root->right = insert(root->right,key);
+        //root->height = MAX(Height(root->right),Height(root->left))+1;
+        if(Height(root->right) - Height(root->left) == 2)
+            if(key > root->right->key)
+                root = reRight(root);
+            else
+                root = reConturnRight(root);
+    }
+    root->height = MAX(Height(root->right),Height(root->left))+1;
+   // printTree(root);
+    return root;
+}
+
+static node *reLeft(node *root)
+{
+    node *k;
+    k = root->left;
+    root->left = k->right;
+    k->right = root;
+    root->height = MAX(Height(root->right),Height(root->left))+1;
+    k->height = MAX(Height(k->right),root->height)+1;
+    return k;
+}
+
+static node *reRight(node *root)
+{
+    node *k;
+    k = root->right;
+    root->right = k->left;
+    k->left = root;
+    root->height = MAX(Height(root->right),Height(root->left))+1;
+    k->height = MAX(Height(k->right),Height((root->left)))+1;
+    return k;
+}
+
+static node *reConturnLeft(node *root)
+{
+    root->left = reRight(root->left);
+    return reLeft(root);
+}
+
+static node *reConturnRight(node *root)
+{
+    root->right = reLeft(root->right);
+    return reRight(root);
+}
+
+static int Height(node* root)
+{
+    if(root == NULL)
+        return -1;
+    else
+        return root->height;
+}
+
+void printTree(node *root)
+{
+    if(root != NULL)
+    {
+        printTree(root->left);
+        printf("%d   ",root->key);
+        printTree(root->right);
+    }
+}
+
+
+//代码要认真敲注重每一个函数细节，每一行出错都要找好久，找的时候就不要瞎鸡巴乱看，直接代数，带几个就知道问题在哪了！！
