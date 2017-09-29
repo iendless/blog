@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_SIZE 10000
+typedef struct position
+{
+    enum {Empty,exist} isEmpty;
+    int key;
+}node;
+typedef struct listi
+{
+    int tableSize;
+    struct position *thelist[20];
+}root;
+
+int find(int key,root *H);
+root* init(int tableSize);
+root* insert(int key,root *H);
+int hash(int key,int tableSize);
+void orderf(root *H);
+
+int main()
+{
+    int data;
+    root *H;
+    int tableSize = 20;
+    H = init(tableSize);
+    while(scanf("%d",&data))
+        H = insert(data,H);
+    orderf(H);
+    return 0;
+}
+
+root *init(int tableSize)
+{
+    root *H;
+    int i;
+    H = (root*)malloc(sizeof(node)*tableSize);
+    if(H == NULL)
+        printf("there is no enough place");
+    for(i=0; i<tableSize; i++)
+    {
+        H->thelist[i] = (node*)malloc(sizeof(node));
+        H->thelist[i] = Empty;
+        H->thelist[i]->key = MAX_SIZE;
+    }
+    return H;
+}
+
+int hash(int key,int tableSize)
+{
+    return key%tableSize;
+}
+
+int find(int key,root *H)
+{
+    int conplictLocation = 1,inLocation;
+    inLocation = hash(key,H->tableSize);
+    while(H->thelist[inLocation]->isEmpty == exist && H->thelist[inLocation]->key == key)
+    {
+        inLocation = 2*(++conplictLocation) - 1;
+        if(inLocation >= H->tableSize)
+            inLocation -= H->tableSize;
+    }
+    return inLocation;
+}
+
+root *insert(int key,root *H)
+{
+    int inLocation;
+    inLocation = find(key,H);
+    H->thelist[inLocation]->key = key;
+    H->thelist[inLocation]->isEmpty = exist;
+    return H;
+}
+
+void orderf(root *H)
+{
+    int i;
+    for(i=0; i < 20; i++)
+        printf("%d  ",H->thelist[i]->key);
+}
+//分列式散列初始化时，每一个CELL除了值以外还有一个判断值是否存在的枚举变量
+//依我看来就是防止自动初始化的数字干扰散列（即把初始值判定为空！！！）
