@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct HeadStruct
+{
+    int Size;
+    int Capacity;
+    int *theList;
+}dui;
+
+dui *initDui(int Capacity);
+dui *insert(dui *H,int key);
+dui *deleteMin(dui *H,int key);
+
+int main()
+{
+    int data,Capacity,i;
+    dui *H;
+    Capacity = scanf("%d",&Capacity);
+    H = initDui(Capacity);
+    for(i = 0; i < Capacity; i++)
+    {
+         scanf("%d",&data);
+         H = insert(H,data);
+    }
+}
+
+dui *initDui(int Capacity)
+{
+    int i;
+    dui *H;
+    H = (dui *)malloc(sizeof(dui));
+    if(H == NULL)
+        printf("there no enough room\n");
+    H->Capacity = Capacity;
+    for(i = 0; i <= Capacity; i++)
+        H->theList[i] = (int*)malloc(sizeof(int));
+    H->Capacity = Capacity;
+    H->theList[1] = 0;
+    return H;
+}
+//定义变量->开辟空间->初始化变量->返回列表
+
+
+dui *insert(dui*H,int key)
+{
+    int i;
+    H->theList[i] =  key;
+    for(i = ++H->Size; key > H->theList[i/2]; i = i/2)
+        H->theList[i] = H->theList[i/2];
+    H->theList[i] = key;
+    return H;
+}
+//每一个函数的实现都在脑海中构想出动画！！！
+
+
+dui *deleteMin(dui *H,int key)
+{
+    int minElement,lastElement,i,child;
+    minElement = H->theList[1];
+    lastElement = H->theList[H->Size--];
+
+    for(i = 1; i < H->Size;i = child)
+    {
+        child = i*2;
+        if(child != H->Size && H->theList[child] > H->theList[child+1])
+            child++;
+        if(lastElement > H->theList[child])
+          H->theList[i] = H->theList[child];
+        else
+            break;
+    }
+}
+//此处删除操作一般来说是返回被删除的元素（二叉树中因为子树无法回溯，故返回被修改的树）
