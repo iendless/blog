@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct treeNode
+{
+    struct treeNode *left;
+    struct treeNode *right;
+    int np;
+    int value;
+}node;
+
+node* insert(node*,int);
+node* merge(node* H1,node* H2);
+node* merge1(node* min,node* max);
+node* deleteMin(node*);
+node* swapChild(node*);
+
+int main()
+{
+    //暂时未学习如何创建一个堆
+}
+
+node* merge(node *H1,node *H2)
+{
+    if(H1 == NULL)
+        return H2;
+    if(H2 == NULL)
+        return H1;
+    if(H1->value < H2->value)
+        return merge1(H1,H2);
+    else
+        return merge1(H2,H1);
+}
+
+node* merge1(node *min,node *max)
+{
+    if(min->right == NULL)
+        min->right = max;
+    else                                          //递归三要素：开始递归，递归终止，递归回传
+    {
+        min->right = merge(min->right,max);
+        if(min->left->value < min->right->value)
+            min = swapChild(min);
+        min->value = min->right->value+1;
+    }
+    return min;
+}                                                //曾思考，此合并算法能否用于二叉树合并，
+                                                //结论是不可以：此算法基于二叉堆左右子堆都大于树根
+
+node* swapChild(node* H)
+{
+    node* t;
+    t = H->left;
+    H->left = H->right;
+    H->right = t;
+    return H;
+}
+
+node* deleteMin(node* H)
+{
+    node* leftHead;
+    node* rightHead;
+    leftHead = malloc(sizeof(node));
+    rightHead = malloc(sizeof(node));
+    leftHead = H->left;
+    rightHead = H->left;
+    free(H);
+    return merge(leftHead,rightHead);
+}
+
+node* insert(node* H,int value)
+{
+    node *newNode = NULL;
+    newNode = (node*)malloc(sizeof(node));
+    newNode->left =newNode->right = NULL;
+    newNode->value = value;
+    newNode->np = 0;
+    H = merge(newNode,H);
+    return H;
+}
