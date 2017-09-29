@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Listnode
+{
+    int key;
+    struct Listnode *next;
+}node;
+typedef struct HashTable
+{
+    int tablesize;
+    struct Listnode *thisList[10];
+};
+
+struct HashTable *initHashTable(int);
+int hash(int,int);
+struct HashTable *insert(struct HashTable*,int);
+node *find(struct HashTable*,int);
+int main()
+{
+    int tableSize = 10,num;
+    struct HashTable *H = NULL;
+    H = (struct HashTable*)malloc(sizeof(struct HashTable));
+    H = initHashTable(tableSize);
+    while(scanf("%d",&num))
+    {
+        H = insert(H,num);
+        ++tableSize;
+    }
+}
+
+struct HashTable *initHashTable(int tableSize)
+{
+    int i;
+    struct HashTable *H;
+    H = (struct HashTable*)malloc(sizeof(struct HashTable));
+    H->tablesize = tableSize;
+    for(i=0; i<tableSize; i++)
+    {
+        H->thisList[i] = (struct Listnode*)malloc(sizeof(struct Listnode));
+        H->thisList[i]->next = NULL;
+    }
+    return H;
+}
+
+int hash(int key,int tableSize)
+{
+    return key % 10;
+}
+
+struct HashTable *insert(struct HashTable *H,int key)
+{
+    node *newNode,*L;
+    L = find(H,key);
+    if(L == NULL)
+    {
+        newNode = (node*)malloc(sizeof(node));
+        L = H->thisList[hash(key,H->tablesize)];
+        newNode->next = L->next;
+        L->next = newNode;
+        newNode->key = key;
+    }
+    return H;
+}
+
+node *find(struct HashTable *H,int key)
+{
+    node *p;
+    p = H->thisList[hash(key,H->tablesize)]->next;
+    while(p != NULL && p->key != key)
+        p = p->next;
+    return p;
+}
